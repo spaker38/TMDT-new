@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 class FindPassword extends StatefulWidget {
   @override
   _FindPasswordState createState() => _FindPasswordState();
@@ -147,7 +149,7 @@ class _FindPasswordState extends State<FindPassword> {
           child:RaisedButton(
               color: sig,
               child: Text(
-                '임시 비밀번호 전송하기',
+                '변경 메일 전송하기',
                 style: TextStyle(
                     fontSize: width /22,
                     fontFamily: 'NanumSquareB'
@@ -162,6 +164,15 @@ class _FindPasswordState extends State<FindPassword> {
               textColor: Colors.white,
               onPressed: () {
                 resetPassword(_emailController.text);
+                Fluttertoast.showToast(
+                    msg: "메일을 전송했습니다.",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    backgroundColor: Color.fromRGBO(133, 192, 64, 80),
+                    textColor: Colors.white,
+                    fontSize: 25.0
+                );
+                Navigator.of(context).pop();
               },
             ),),
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -231,6 +232,14 @@ class _ChangePasswordState extends State<ChangePassword> {
     if(checkCurrentPasswordValid){
     if(_changepw.text==_changepw2.text){
     _changePassword(_changepw.text);
+    Fluttertoast.showToast(
+        msg: "메일을 전송했습니다.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Color.fromRGBO(133, 192, 64, 80),
+        textColor: Colors.white,
+        fontSize: 25.0
+    );
     Navigator.of(context).pop();
     }
     else

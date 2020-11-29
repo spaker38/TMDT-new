@@ -89,8 +89,6 @@ class _ReviewState extends State<Review> {
         builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
           if (snapshot.hasData) {
             _uid = snapshot.data.uid;
-            print('뭐야');
-
             Firestore.instance.collection('Users').document(_uid).get().then((DocumentSnapshot ds){
                 _roomName = ds.data['방 유형후기'];
                 _checkIn = ds.data['입실일후기'];
