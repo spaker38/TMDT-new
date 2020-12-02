@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,6 +43,7 @@ class _FeedPageState extends State<FeedPage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+
 
   @override
   void initState() {
@@ -192,15 +194,94 @@ class _FeedPageState extends State<FeedPage> {
                       ]),
                       Row(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: FadeInImage(
-                              width: width / 5,
-                              height: height / 5,
-                              placeholder:
-                                  AssetImage("assets/images/placeholder.png"),
-                              image: NetworkImage(posts[i].data["photoUrl"]),
+                          FlatButton(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: FadeInImage(
+                                width: width / 5,
+                                height: height / 5,
+                                placeholder:
+                                    AssetImage("assets/images/placeholder.png"),
+                                image: NetworkImage(posts[i].data["photoUrl"]),
+                              ),
                             ),
+                            onPressed: (){
+                              setState(() {
+                              });
+                              final List<String> imgList =[
+                                posts[i].data['photoUrl'],
+                                posts[i].data['photoUrl2'],
+                                posts[i].data['photoUrl3'],
+
+                              ];
+
+
+                              if(posts[i].data["photoUrl2"] == '')
+                              showDialog(
+                                context: context,
+                                  builder: (context) {
+                                  return Dialog(
+                                child: CarouselSlider(
+                                  options: CarouselOptions(height: 400.0, enableInfiniteScroll: false),
+                                  items: imgList.map((item) {
+                                    return Builder(
+                                      builder: (BuildContext context) {
+                                        return Container(
+                                            width: MediaQuery.of(context).size.width,
+                                            margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                            child: Image.network(item, fit:BoxFit.cover, width:1000)
+                                        );
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                              );});
+
+                              else
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        child: CarouselSlider(
+                                          options: CarouselOptions(height: 400.0, enableInfiniteScroll: false),
+                                          items: imgList.map((item) {
+                                            return Builder(
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                    width: MediaQuery.of(context).size.width,
+                                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                                    child: Image.network(item, fit:BoxFit.cover, width:1000)
+                                                );
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                      );});
+
+
+
+                              else if(posts[i].data['photoUrl3'] == '')
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        child: CarouselSlider(
+                                          options: CarouselOptions(height: 400.0, enableInfiniteScroll: false),
+                                          items: [1,2].map((a) {
+                                            return Builder(
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                    width: MediaQuery.of(context).size.width,
+                                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                                    child: Image(image: NetworkImage(posts[i].data["photoUrl"])
+                                                    ));
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                      );});
+
+                            },
                           ),
                           SizedBox(width: width / 10),
                           Text(

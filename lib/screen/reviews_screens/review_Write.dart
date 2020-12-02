@@ -75,6 +75,8 @@ class _ReviewWriteState extends State<ReviewWrite> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _db = Firestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
@@ -89,7 +91,7 @@ class _ReviewWriteState extends State<ReviewWrite> {
     super.dispose();
   }
 
-  uploadImage() async {
+  uploadImage1() async {
     try {
       setState(() {
         _isUploading = true;
@@ -123,6 +125,64 @@ class _ReviewWriteState extends State<ReviewWrite> {
 
       _db.collection("Reviews").add({
         "photoUrl": photoUrl,
+        "photoUrl2": '',
+        "photoUrl3": '',
+        "name": user.displayName,
+        "caption": textEditingController.text,
+        "date": DateTime.now(),
+        "uid": user.uid,
+        "starRate": _starRate,
+        'roomType': _roomName,
+      });
+
+      // when completed
+      setState(() {
+        _isUploading = false;
+        _isUploadCompleted = true;
+      });
+
+      streamSubscription.cancel();
+      Navigator.pop(this.context);
+    } catch (e) {
+      print(e);
+    }
+  }
+  uploadImage2() async {
+    try {
+      setState(() {
+        _isUploading = true;
+        _uploadProgress = 0;
+      });
+
+      FirebaseUser user = await _auth.currentUser();
+
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString() +
+          basename(_image2.path);
+
+      final StorageReference storageReference =
+      _storage.ref().child("Review_Image").child(user.uid).child(fileName);
+
+      final StorageUploadTask uploadTask = storageReference.putFile(_image2);
+
+      final StreamSubscription<StorageTaskEvent> streamSubscription =
+      uploadTask.events.listen((event) {
+        var totalBytes = event.snapshot.totalByteCount;
+        var transferred = event.snapshot.bytesTransferred;
+
+        double progress = ((transferred * 100) / totalBytes) / 100;
+        setState(() {
+          _uploadProgress = progress;
+        });
+      });
+
+      StorageTaskSnapshot onComplete = await uploadTask.onComplete;
+
+      String photoUrl = await onComplete.ref.getDownloadURL();
+
+      _db.collection("Reviews").add({
+        "photoUrl": '',
+        "photoUrl2": photoUrl,
+        "photoUrl3": '',
         "name": user.displayName,
         "caption": textEditingController.text,
         "date": DateTime.now(),
@@ -144,6 +204,64 @@ class _ReviewWriteState extends State<ReviewWrite> {
     }
   }
 
+  uploadImage3() async {
+    try {
+      setState(() {
+        _isUploading = true;
+        _uploadProgress = 0;
+      });
+
+      FirebaseUser user = await _auth.currentUser();
+
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString() +
+          basename(_image3.path);
+
+      final StorageReference storageReference =
+      _storage.ref().child("Review_Image").child(user.uid).child(fileName);
+
+      final StorageUploadTask uploadTask = storageReference.putFile(_image3);
+
+      final StreamSubscription<StorageTaskEvent> streamSubscription =
+      uploadTask.events.listen((event) {
+        var totalBytes = event.snapshot.totalByteCount;
+        var transferred = event.snapshot.bytesTransferred;
+
+        double progress = ((transferred * 100) / totalBytes) / 100;
+        setState(() {
+          _uploadProgress = progress;
+        });
+      });
+
+      StorageTaskSnapshot onComplete = await uploadTask.onComplete;
+
+      String photoUrl = await onComplete.ref.getDownloadURL();
+
+      _db.collection("Reviews").add({
+        "photoUrl":'',
+        "photoUrl2":'',
+        "photoUrl3": photoUrl,
+        "name": user.displayName,
+        "caption": textEditingController.text,
+        "date": DateTime.now(),
+        "uid": user.uid,
+        "starRate": _starRate,
+        'roomType': _roomName,
+      });
+
+      // when completed
+      setState(() {
+        _isUploading = false;
+        _isUploadCompleted = true;
+      });
+
+      streamSubscription.cancel();
+      Navigator.pop(this.context);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
   Review review = new Review();
 
   @override
@@ -160,6 +278,7 @@ class _ReviewWriteState extends State<ReviewWrite> {
 
 
     return Scaffold(
+      key: scaffoldKey,
       resizeToAvoidBottomPadding: false,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(MediaQuery.of(context).size.height / 15),
@@ -358,6 +477,12 @@ class _ReviewWriteState extends State<ReviewWrite> {
                            child: FlatButton(
                              child: Icon(Icons.add_a_photo) ,
                              onPressed: () {
+                               if(_image==null)
+                                 scaffoldKey.currentState.showSnackBar(SnackBar(
+                                   content: Text('앞의 사진을 선택해주세요.'),
+                                   duration: Duration(seconds: 2),
+                                 ));
+                                 else
                                getImage(ImageSource.gallery, '2');
                              },
                            ),
@@ -377,6 +502,12 @@ class _ReviewWriteState extends State<ReviewWrite> {
                            child: FlatButton(
                              child: Icon(Icons.add_a_photo) ,
                              onPressed: () {
+                               if(_image2 =null)
+                               scaffoldKey.currentState.showSnackBar(SnackBar(
+                                   content: Text('앞의 사진을 먼저 선택해주세요.'),
+                               duration: Duration(seconds: 2),
+                               ));
+                               else
                                getImage(ImageSource.gallery, '3');
                              },
                            ),
@@ -462,23 +593,79 @@ SizedBox(height: height/20,),
                                         child: Text('OK',
                                             style: TextStyle(color: green2)),
                                         onPressed: () async {
-                                          if (_image != null)
-                                            uploadImage();
+                                          if (_image != null && _image2 != null && _image3 !=null){
+                                            uploadImage1();
+                                          uploadImage2();
+                                          uploadImage3();}
+                                          // else if (_image == null) {
+                                          //   FirebaseUser user =
+                                          //       await _auth.currentUser();
+                                          //   _db.collection("Reviews").add({
+                                          //     "photoUrl":
+                                          //         'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                          //     "name": user.displayName,
+                                          //     "caption":
+                                          //         textEditingController.text,
+                                          //     "date": DateTime.now(),
+                                          //     "uid": user.uid,
+                                          //     "starRate": _starRate,
+                                          //     "roomType": _roomName,
+                                          //   });
+                                          // }
                                           else if (_image == null) {
                                             FirebaseUser user =
-                                                await _auth.currentUser();
+                                            await _auth.currentUser();
                                             _db.collection("Reviews").add({
                                               "photoUrl":
-                                                  'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                              'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
                                               "name": user.displayName,
                                               "caption":
-                                                  textEditingController.text,
+                                              textEditingController.text,
                                               "date": DateTime.now(),
                                               "uid": user.uid,
                                               "starRate": _starRate,
                                               "roomType": _roomName,
                                             });
                                           }
+                                          else if (_image == null && _image2 == null) {
+                                            uploadImage3();
+                                            FirebaseUser user =
+                                            await _auth.currentUser();
+                                            _db.collection("Reviews").add({
+                                              "photoUrl":
+                                              'https://firebasestorage.goog;leapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                              "photoUrl2":
+                                              'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                              "name": user.displayName,
+                                              "caption":
+                                              textEditingController.text,
+                                              "date": DateTime.now(),
+                                              "uid": user.uid,
+                                              "starRate": _starRate,
+                                              "roomType": _roomName,
+                                            });
+                                          }
+
+                                          else if (_image2 == null && _image3 == null ) {
+                                            FirebaseUser user =
+                                            await _auth.currentUser();
+                                            uploadImage1();
+
+                                            _db.collection("Reviews").add({
+                                              "photoUrl2":
+                                              'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                              "photoUrl3":
+                                              'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                              "name": user.displayName,
+                                              "caption":
+                                              textEditingController.text,
+                                              "date": DateTime.now(),
+                                              "uid": user.uid,
+                                              "starRate": _starRate,
+                                              "roomType": _roomName,
+                                            });
+                                          }
+
                                           Navigator.of(context).pop();
                                           // Navigator.of(context).pushReplacement(CustomWidgetExample(index: 1,));
                                           //  Navigator.pushNamedAndRemoveUntil(context, '/review', (route) => false);
