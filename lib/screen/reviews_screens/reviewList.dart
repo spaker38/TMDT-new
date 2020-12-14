@@ -208,28 +208,44 @@ class _FeedPageState extends State<FeedPage> {
                             onPressed: (){
                               setState(() {
                               });
-                              final List<String> imgList =[
+
+                               List<String> imgList;
+
+
+                               if(posts[i].data["photoUrl"]=='')
+                                 imgList =[
+                                   'https://firebasestorage.googleapis.com/v0/b/tu-domi.appspot.com/o/Review_Image%2FH49QVtz9ixQe4hl35UEEJvgSviO2%2Fno-image.png?alt=media&token=313fc659-6990-4304-b61b-e01ff9a3abb3',
+                                 ];
+                              else if(posts[i].data["photoUrl2"] == ''&& posts[i].data["photoUrl3"]=='')
+                                imgList =[
                                 posts[i].data['photoUrl'],
-                                posts[i].data['photoUrl2'],
-                                posts[i].data['photoUrl3'],
-
                               ];
+                              else if(posts[i].data["photoUrl"]!= '' && posts[i].data["photoUrl2"]!= '' && posts[i].data["photoUrl3"]=='')
+                                imgList=[
+                                  posts[i].data['photoUrl'],
+                                  posts[i].data['photoUrl2']
+                                ];
+                              else
+                                imgList=[
+                                  posts[i].data['photoUrl'],
+                                  posts[i].data['photoUrl2'],
+                                  posts[i].data['photoUrl3'],
+                                ];
 
-
-                              if(posts[i].data["photoUrl2"] == '')
                               showDialog(
                                 context: context,
                                   builder: (context) {
                                   return Dialog(
                                 child: CarouselSlider(
-                                  options: CarouselOptions(height: 400.0, enableInfiniteScroll: false),
+                                  options: CarouselOptions(height:height/1.5,enableInfiniteScroll: false),
                                   items: imgList.map((item) {
                                     return Builder(
                                       builder: (BuildContext context) {
                                         return Container(
+                                            height: height,
                                             width: MediaQuery.of(context).size.width,
-                                            margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                            child: Image.network(item, fit:BoxFit.cover, width:1000)
+                                           // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                            child: Image.network(item, fit:BoxFit.contain, width:width/2)
                                         );
                                       },
                                     );
@@ -237,49 +253,6 @@ class _FeedPageState extends State<FeedPage> {
                                 ),
                               );});
 
-                              else
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: CarouselSlider(
-                                          options: CarouselOptions(height: 400.0, enableInfiniteScroll: false),
-                                          items: imgList.map((item) {
-                                            return Builder(
-                                              builder: (BuildContext context) {
-                                                return Container(
-                                                    width: MediaQuery.of(context).size.width,
-                                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                                    child: Image.network(item, fit:BoxFit.cover, width:1000)
-                                                );
-                                              },
-                                            );
-                                          }).toList(),
-                                        ),
-                                      );});
-
-
-
-                              else if(posts[i].data['photoUrl3'] == '')
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: CarouselSlider(
-                                          options: CarouselOptions(height: 400.0, enableInfiniteScroll: false),
-                                          items: [1,2].map((a) {
-                                            return Builder(
-                                              builder: (BuildContext context) {
-                                                return Container(
-                                                    width: MediaQuery.of(context).size.width,
-                                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                                    child: Image(image: NetworkImage(posts[i].data["photoUrl"])
-                                                    ));
-                                              },
-                                            );
-                                          }).toList(),
-                                        ),
-                                      );});
 
                             },
                           ),
@@ -342,47 +315,47 @@ class _FeedPageState extends State<FeedPage> {
                                                                     .bold),
                                                       ),
 //                                                    SizedBox(height: height/20,),
-                                                      Row(children: [
-                                                        SizedBox(
-                                                          width: width / 20,
-                                                        ),
-                                                        // showImage(),
-                                                        _image == null
-                                                            ? Text('No Image')
-                                                            : Image.file(
-                                                                _image,
-                                                                width:
-                                                                    width / 3,
-                                                                height:
-                                                                    height / 5,
-                                                              ),
-                                                        SizedBox(
-                                                          width: width / 8,
-                                                        ),
-
-                                                        FlatButton(
-                                                          child: Icon(Icons
-                                                              .add_a_photo),
-                                                          onPressed: () async {
-                                                            File image =
-                                                                await ImagePicker
-                                                                    .pickImage(
-                                                                        source:
-                                                                            ImageSource.gallery);
-                                                            imageName =
-                                                                image.uri;
-                                                            setState(() {
-                                                              _image = image;
-                                                            });
-                                                          },
-                                                        )
-                                                      ]),
+//                                                       Row(children: [
+//                                                         SizedBox(
+//                                                           width: width / 20,
+//                                                         ),
+//                                                         // showImage(),
+//                                                         _image == null
+//                                                             ? Text('No Image')
+//                                                             : Image.file(
+//                                                                 _image,
+//                                                                 width:
+//                                                                     width / 3,
+//                                                                 height:
+//                                                                     height / 5,
+//                                                               ),
+//                                                         SizedBox(
+//                                                           width: width / 8,
+//                                                         ),
+//
+//                                                         FlatButton(
+//                                                           child: Icon(Icons
+//                                                               .add_a_photo),
+//                                                           onPressed: () async {
+//                                                             File image =
+//                                                                 await ImagePicker
+//                                                                     .pickImage(
+//                                                                         source:
+//                                                                             ImageSource.gallery);
+//                                                             imageName =
+//                                                                 image.uri;
+//                                                             setState(() {
+//                                                               _image = image;
+//                                                             });
+//                                                           },
+//                                                         )
+//                                                       ]),
                                                       SmoothStarRating(
                                                         rating: 0,
                                                         color: green1,
                                                         borderColor: green1,
                                                         isReadOnly: false,
-                                                        size: 30,
+                                                        size: 50,
                                                         filledIconData:
                                                             Icons.star,
                                                         halfFilledIconData:
@@ -396,6 +369,7 @@ class _FeedPageState extends State<FeedPage> {
                                                           _starRate = value;
                                                         },
                                                       ),
+                                                      SizedBox(height: height/10,),
                                                       TextField(
                                                         keyboardType:
                                                             TextInputType
@@ -444,10 +418,9 @@ class _FeedPageState extends State<FeedPage> {
                                                       SizedBox(
                                                         height: height / 8,
                                                       ),
-                                                      Row(children: [
-                                                        SizedBox(
-                                                          width: width / 20,
-                                                        ),
+                                                      Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
                                                         Container(
                                                             width: width / 5,
                                                             decoration:
@@ -472,9 +445,6 @@ class _FeedPageState extends State<FeedPage> {
                                                                     .pop();
                                                               },
                                                             )),
-                                                        SizedBox(
-                                                          width: width / 3.5,
-                                                        ),
                                                         Container(
                                                             width: width / 5,
                                                             decoration:
